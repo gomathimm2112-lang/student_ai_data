@@ -63,8 +63,8 @@
 				]
 			},
 			{
-				"name": "studaidata_transform",
-				"type": "DatabricksJob",
+				"name": "ingest_data",
+				"type": "DatabricksNotebook",
 				"dependsOn": [
 					{
 						"activity": "studaidata_ingest",
@@ -82,7 +82,61 @@
 				},
 				"userProperties": [],
 				"typeProperties": {
-					"jobId": "68948807859612"
+					"notebookPath": "/Users/gomathimm2112@gmail.com/ai_data/01_bronze/studaidata_raw"
+				},
+				"linkedServiceName": {
+					"referenceName": "AzureDatabricks1",
+					"type": "LinkedServiceReference"
+				}
+			},
+			{
+				"name": "transform_data",
+				"type": "DatabricksNotebook",
+				"dependsOn": [
+					{
+						"activity": "ingest_data",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"notebookPath": "/Users/gomathimm2112@gmail.com/ai_data/02_silver/studaidata_enriched"
+				},
+				"linkedServiceName": {
+					"referenceName": "AzureDatabricks1",
+					"type": "LinkedServiceReference"
+				}
+			},
+			{
+				"name": "summarise_data",
+				"type": "DatabricksNotebook",
+				"dependsOn": [
+					{
+						"activity": "transform_data",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"notebookPath": "/Users/gomathimm2112@gmail.com/ai_data/03_gold/studaidata_summary"
 				},
 				"linkedServiceName": {
 					"referenceName": "AzureDatabricks1",
