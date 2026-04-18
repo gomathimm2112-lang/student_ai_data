@@ -1,0 +1,83 @@
+{
+  "name": "studaidata_job",
+  "description": "Pipeline of jobs to orchestrate the generation of analysis reports based on the student AI tool usage data. ",
+  "email_notifications": {
+    "no_alert_for_skipped_runs": false
+  },
+  "webhook_notifications": {},
+  "timeout_seconds": 0,
+  "max_concurrent_runs": 1,
+  "tasks": [
+    {
+      "task_key": "ingest_data",
+      "run_if": "ALL_SUCCESS",
+      "notebook_task": {
+        "notebook_path": "/Workspace/Users/gomathimm2112@gmail.com/ai_data/01_bronze/studaidata_raw",
+        "source": "WORKSPACE"
+      },
+      "job_cluster_key": "New_job_cluster",
+      "timeout_seconds": 0,
+      "email_notifications": {},
+      "webhook_notifications": {}
+    },
+    {
+      "task_key": "cleanse_data",
+      "depends_on": [
+        {
+          "task_key": "ingest_data"
+        }
+      ],
+      "run_if": "ALL_SUCCESS",
+      "notebook_task": {
+        "notebook_path": "/Workspace/Users/gomathimm2112@gmail.com/ai_data/02_silver/studaidata_enriched",
+        "source": "WORKSPACE"
+      },
+      "job_cluster_key": "New_job_cluster",
+      "timeout_seconds": 0,
+      "email_notifications": {},
+      "webhook_notifications": {}
+    },
+    {
+      "task_key": "enrich_data",
+      "depends_on": [
+        {
+          "task_key": "cleanse_data"
+        }
+      ],
+      "run_if": "ALL_SUCCESS",
+      "notebook_task": {
+        "notebook_path": "/Workspace/Users/gomathimm2112@gmail.com/ai_data/03_gold/studaidata_summary",
+        "source": "WORKSPACE"
+      },
+      "job_cluster_key": "New_job_cluster",
+      "timeout_seconds": 0,
+      "email_notifications": {},
+      "webhook_notifications": {}
+    }
+  ],
+  "job_clusters": [
+    {
+      "job_cluster_key": "New_job_cluster",
+      "new_cluster": {
+        "cluster_name": "",
+        "spark_version": "17.3.x-scala2.13",
+        "node_type_id": "Standard_D4s_v3",
+        "spark_env_vars": {
+          "PYSPARK_PYTHON": "/databricks/python3/bin/python3"
+        },
+        "data_security_mode": "DATA_SECURITY_MODE_DEDICATED",
+        "runtime_engine": "STANDARD",
+        "kind": "CLASSIC_PREVIEW",
+        "is_single_node": true
+      }
+    }
+  ],
+  "git_source": {
+    "git_url": "https://github.com/gomathimm2112-lang/student_ai_data.git",
+    "git_provider": "gitHub",
+    "git_commit": "main/commit"
+  },
+  "queue": {
+    "enabled": true
+  }
+}
